@@ -3,6 +3,8 @@
 # Downloads video from a reddit post.
 # Method from u/budzen. https://www.reddit.com/r/Enhancement/comments/6yl9tt/any_way_to_get_the_direct_link_to_reddithosted/duwxtij/
 
+echo "Spooling..."
+
 #Help.
 function show_help () {
 	echo "Usage: rvd <option> <url>
@@ -44,7 +46,7 @@ video_url=$(curl -s -A "random" "$media_json" | json_pp |
 audio_url=$(echo "$video_url" | sed 's/DASH.*?/audio?/')
 
 filename=$(curl -s -A "random" "$media_json" | json_pp |
-		grep -m 2 title | sed 's/.*: "//;s/",//;s/ /-/g;s/\.//g' |
+		grep -m 2 title | sed 's/.*: "//; s/",//; s/ /-/g; s/\.//g; s/\\//g; s/"//g;' |
 		tail -n1)
 echo "title: $filename"
 
@@ -57,7 +59,7 @@ echo "Pulling video from $video_url:"
 # Define filename if not overwritten by option.
 if [ -z "$output_file" ]; then
 	echo "Output file is empty, naming $filename..."
-	output_file="$filename"
+	output_file=$(echo "$filename" | cut -d "-" -f 1-5)
 fi
 
 # Combine the two with ffmpeg.
