@@ -5,14 +5,15 @@
 
 #Help.
 function show_help () {
-	echo "Usage:
-		-h		Show this help page.
-		-o FILE		Write output to FILE.
+	echo "Usage: rvd <option> <url>
+	-h		Show this help page.
+	-o FILE		Write output to FILE.
 	"
 	}
 
 #Options fluff.
 output_file="rvd-output"
+output_format="mp4"
 
 while getopts "ho:" o; do
 	case "${o}" in
@@ -20,13 +21,13 @@ while getopts "ho:" o; do
 		;;
 	o)	output_file=$OPTARG
 		;;
-	*)	show_help & exit 0
+	\?*)	show_help & exit 0
 		;;
 	esac
 done
 shift $((OPTIND -1))
 
-if [ -z "${s}" ] || [ -z "${p}" ]; then
+if [ $# -eq 0 ]; then
 	show_help & exit 0
 fi
 
@@ -48,7 +49,7 @@ echo "Pulling video from $video_url:"
 	wget -O rvd-video $video_url
 
 #Combine the two with ffmpeg.
-ffmpeg -i rvd-video -i rvd-audio -c:v copy -c:a aac $output_file.mp4
+ffmpeg -i rvd-video -i rvd-audio -c:v copy -c:a aac $output_file.$output_format
 
 #Cleanup.
 rm rvd-video rvd-audio
