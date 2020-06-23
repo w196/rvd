@@ -10,12 +10,14 @@ echo "Spooling..."
 function show_help () {
 	echo "Usage: rvd <option> <url>
 	-h			Show this help page.
-	-b 			Process args as bulk.
-	-f FORMAT	Write to FORMAT (mp4, m4a etc.) No webm."
+	-f FORMAT	Write to FORMAT (mp4, m4a etc.)
+	-q 1 - 10	Write with quality 1 - 10.
+
+	WEBM needs to be re-encoded because of how reddit stores video. Very slow; mp4 is advised."
 	}
 
 function fetch_json () { # Get json from link and extract the video and audio urls.
-	output_file=""
+	output_file="" 
 
 	media_json="${1}.json"
 
@@ -32,10 +34,7 @@ function fetch_json () { # Get json from link and extract the video and audio ur
 	echo "title: $filename"
 
 	# Define filename if not overwritten by option.
-	if [ -z "$output_file" ]; then
-		echo "Output file is empty, naming $filename..."
-		output_file=$(echo "$filename" | cut -d "-" -f 1-5)
-	fi
+	output_file=$(echo "$filename" | cut -d "-" -f 1-5)
 }
 
 function pull_content {	#Pull audio and video from the urls.
@@ -44,8 +43,12 @@ function pull_content {	#Pull audio and video from the urls.
 	echo "Pulling video from $video_url:"
 		wget -O rvd-video "$video_url"
 	
-	# Combine the two with ffmpeg.
-	ffmpeg -i rvd-video -i rvd-audio -c:v copy -c:a copy "$output_file"."$output_format"
+	# Combine the two with ffmpeg. Re-encode if webm requested.
+	if [ "$output_format" == "webm" ]; then
+		ffmpeg -i rvd-video -i rvd-audio -q:v "$output_quality" -c:v libvpx -c:a libvorbis "$output_file".webm
+	else
+		ffmpeg -i rvd-video -i rvd-audio -q:v "$output_quality" -c:v copy -c:a copy "$output_file"."$output_format"
+	fi
 }
 
 function do_bulk {
@@ -58,12 +61,15 @@ function do_bulk {
 # Options fluff.
 output_file=""
 output_format="mp4"
+output_quality="10"
 
-while getopts "ho:f:" o; do
+while getopts "ho:f:q:" o; do
 	case "${o}" in
 	h)	show_help && exit 0
 		;;
 	f)	output_format="$OPTARG"
+		;;
+	q)	output_quality="$OPTARG"
 		;;
 	\?*)show_help && exit 0
 		;;
