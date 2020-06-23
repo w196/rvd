@@ -1,4 +1,4 @@
 ## rvd - a very simple reddit video downloader.
 Requires wget and ffmpeg.
 
-Usage: `./rvd.sh -o <output file> -f <format> ... <url>`
+Usage: `./rvd.sh -f <format> ... <urls>`
