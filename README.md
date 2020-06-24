@@ -3,9 +3,9 @@ Requires wget and ffmpeg.
 
 Usage:
 ```
-./rvd <options> <urls
-	h 		Show help page.
-	f FORMAT	Write to FORMAT (mp4, m4a etc.)
-	q 1 - 10	Write with quality 1 - 10.
+./rvd <options> <urls>
+	-h 			Show this help page.
+	-f FORMAT	Write to FORMAT (mp4, m4a etc.)
+	-b BITRATE	Write with BITRATE if webm.
 ```
-WEBM needs to be re-encoded because of how reddit stores video. Very slow; mp4 is advised.
+WEBM needs to be re-encoded because of how reddit stores video. May be slow for longer videos.

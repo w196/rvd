@@ -3,18 +3,13 @@
 # Downloads video from a reddit post.
 # Method from u/budzen. https://www.reddit.com/r/Enhancement/comments/6yl9tt/any_way_to_get_the_direct_link_to_reddithosted/duwxtij/
 
-echo ""
-echo "Spooling..."
-
 #Help.
 function show_help () {
 	echo "Usage: rvd <option> <url>
-	-h			Show this help page.
+	-h 		Show this help page.
 	-f FORMAT	Write to FORMAT (mp4, m4a etc.)
-	-q 1 - 10	Write with quality 1 - 10.
-
-	WEBM needs to be re-encoded because of how reddit stores video. Very slow; mp4 is advised."
-	}
+	-b BITRATE	Write with BITRATE if webm."
+}
 
 function fetch_json () { # Get json from link and extract the video and audio urls.
 	output_file="" 
@@ -45,9 +40,9 @@ function pull_content {	#Pull audio and video from the urls.
 	
 	# Combine the two with ffmpeg. Re-encode if webm requested.
 	if [ "$output_format" == "webm" ]; then
-		ffmpeg -i rvd-video -i rvd-audio -q:v "$output_quality" -c:v libvpx -c:a libvorbis "$output_file".webm
+		ffmpeg -i rvd-video -i rvd-audio -b:v "$output_bitrate" -c:v libvpx -c:a libvorbis "$output_file".webm
 	else
-		ffmpeg -i rvd-video -i rvd-audio -q:v "$output_quality" -c:v copy -c:a copy "$output_file"."$output_format"
+		ffmpeg -i rvd-video -i rvd-audio -q:av -c:av copy "$output_file"."$output_format"
 	fi
 }
 
@@ -61,15 +56,14 @@ function do_bulk {
 # Options fluff.
 output_file=""
 output_format="mp4"
-output_quality="10"
 
-while getopts "ho:f:q:" o; do
+while getopts "ho:f:b:" o; do
 	case "${o}" in
 	h)	show_help && exit 0
 		;;
 	f)	output_format="$OPTARG"
 		;;
-	q)	output_quality="$OPTARG"
+	b)	output_bitrate="$OPTARG"
 		;;
 	\?*)show_help && exit 0
 		;;
