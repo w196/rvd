@@ -42,7 +42,7 @@ function pull_content {	#Pull audio and video from the urls.
 	if [ "$output_format" == "webm" ]; then
 		ffmpeg -i rvd-video -i rvd-audio -b:v "$output_bitrate" -c:v libvpx -c:a libvorbis "$output_file".webm
 	else
-		ffmpeg -i rvd-video -i rvd-audio -q:av -c:av copy "$output_file"."$output_format"
+		ffmpeg -i rvd-video -i rvd-audio -c:a copy -c:v copy "$output_file"."$output_format"
 	fi
 }
 
