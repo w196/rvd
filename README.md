@@ -1,4 +1,6 @@
-## rvd - a very simple reddit video downloader.
+# this is broken
+## i'll fix it someday
+
 Requires wget and ffmpeg.
 
 Usage:
